@@ -30,4 +30,4 @@ A planilha lida pelo script deve conter as seguintes colunas obrigatórias:
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/Pamelaaalexandre/Controle-Metereologico.git
+ https://github.com/Pamelaaalexandre/Controle-Metereologico.git
