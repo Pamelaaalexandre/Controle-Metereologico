@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Localização</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --error-bg: #fee2e2;
+      --error-text: #991b1b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1.25rem;
+    }
+
+    .container {
+      background: var(--card);
+      width: 100%;
+      max-width: 440px;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      border: 1px solid #e2e8f0;
+    }
+
+    header {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+    }
+
+    p.subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem 0.875rem;
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background-color: #fff;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .coords-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-geo {
+      background-color: #eff6ff;
+      color: var(--primary);
+      border: 1px solid #bfdbfe;
+      margin-bottom: 1.25rem;
+    }
+
+    .btn-geo:hover {
+      background-color: #dbeafe;
+    }
+
+    .btn-submit {
+      background-color: var(--primary);
+      color: #ffffff;
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 1.25rem;
+      padding: 0.875rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-align: center;
+      display: none;
+    }
+
+    .status.success {
+      display: block;
+      background-color: var(--success-bg);
+      color: var(--success-text);
+    }
+
+    .status.error {
+      display: block;
+      background-color: var(--error-bg);
+      color: var(--error-text);
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="container">
+    <header>
+      <h1>Check-in de Localização</h1>
+      <p class="subtitle">Preencha o nome do local e capture as coordenadas</p>
+    </header>
+
+    <form id="geoForm">
+      <div class="form-group">
+        <label for="local">Nome do Local</label>
+        <input 
+          type="text" 
+          id="local" 
+          name="entry.23177176" 
+          placeholder="Ex: Escritório Central, Loja 02..." 
+          required
+        >
+      </div>
+
+      <button type="button" id="btnGetLocation" class="btn btn-geo">
+        <span class="spinner" id="geoSpinner"></span>
+        <span id="geoBtnText">📍 Capturar GPS Atual</span>
+      </button>
+
+      <div class="coords-grid">
+        <div class="form-group">
+          <label for="latitude">Latitude</label>
+          <input 
+            type="text" 
+            id="latitude" 
+            name="entry.1142039205" 
+            placeholder="-22.9099" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="longitude">Longitude</label>
+          <input 
+            type="text" 
+            id="longitude" 
+            name="entry.1413599545" 
+            placeholder="-47.0626" 
+            required
+          >
+        </div>
+      </div>
+
+      <button type="submit" id="btnSubmit" class="btn btn-submit">
+        <span class="spinner" id="submitSpinner"></span>
+        <span id="submitBtnText">Enviar Registro</span>
+      </button>
+
+      <div id="statusMessage" class="status" role="alert"></div>
+    </form>
+  </main>
+
+  <script>
+    const FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScIBxX3QBCCyTbkcsRe1fRZU7zxKaXqgX1UEtbutofrCsprdg/formResponse';
+
+    const form = document.getElementById('geoForm');
+    const btnGetLocation = document.getElementById('btnGetLocation');
+    const geoSpinner = document.getElementById('geoSpinner');
+    const geoBtnText = document.getElementById('geoBtnText');
+
+    const btnSubmit = document.getElementById('btnSubmit');
+    const submitSpinner = document.getElementById('submitSpinner');
+    const submitBtnText = document.getElementById('submitBtnText');
+
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+    const statusMessage = document.getElementById('statusMessage');
+
+    function showStatus(message, type) {
+      statusMessage.textContent = message;
+      statusMessage.className = `status ${type}`;
+    }
+
+    function hideStatus() {
+      statusMessage.className = 'status';
+      statusMessage.textContent = '';
+    }
+
+    // Captura de Geolocalização via API nativa do navegador
+    btnGetLocation.addEventListener('click', () => {
+      hideStatus();
+
+      if (!('geolocation' in navigator)) {
+        showStatus('Seu navegador não suporta geolocalização.', 'error');
+        return;
+      }
+
+      btnGetLocation.disabled = true;
+      geoSpinner.style.display = 'inline-block';
+      geoBtnText.textContent = 'Obtendo coordenadas...';
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          latInput.value = position.coords.latitude.toFixed(6);
+          lngInput.value = position.coords.longitude.toFixed(6);
+
+          btnGetLocation.disabled = false;
+          geoSpinner.style.display = 'none';
+          geoBtnText.textContent = '✅ Localização Atualizada';
+        },
+        (error) => {
+          let errorMsg = 'Não foi possível obter a localização.';
+          if (error.code === error.PERMISSION_DENIED) {
+            errorMsg = 'Permissão de localização negada. Libere o GPS no navegador ou digite manualmente.';
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            errorMsg = 'Sinal de GPS indisponível no momento.';
+          } else if (error.code === error.TIMEOUT) {
+            errorMsg = 'Tempo esgotado ao buscar localização.';
+          }
+
+          showStatus(errorMsg, 'error');
+          btnGetLocation.disabled = false;
+          geoSpinner.style.display = 'none';
+          geoBtnText.textContent = '📍 Tentar Capturar Novamente';
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+
+    // Envio silencioso para o Google Forms
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideStatus();
+
+      btnSubmit.disabled = true;
+      submitSpinner.style.display = 'inline-block';
+      submitBtnText.textContent = 'Enviando...';
+
+      const formData = new FormData(form);
+      const urlEncodedData = new URLSearchParams(formData).toString();
+
+      try {
+        await fetch(FORM_ACTION_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Necessário pois o Google Forms não retorna cabeçalhos CORS
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: urlEncodedData
+        });
+
+        showStatus('Dados registrados com sucesso na planilha!', 'success');
+        form.reset();
+        geoBtnText.textContent = '📍 Capturar GPS Atual';
+      } catch (err) {
+        showStatus('Erro de rede ao tentar enviar. Verifique sua conexão.', 'error');
+      } finally {
+        btnSubmit.disabled = false;
+        submitSpinner.style.display = 'none';
+        submitBtnText.textContent = 'Enviar Registro';
+      }
+    });
+  </script>
+</body>
+</html>
